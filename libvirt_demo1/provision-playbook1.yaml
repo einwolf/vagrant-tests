@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: ping hosts
+      ping:
+    - name: Shell write test
+      shell: echo "Ansible provision at $(date)" > /etc/ansible_provisioned_at
+    - name: Copy write test
+      copy:
+        dest: /etc/ansible_copy_test
+        content: |
+          This is a test file. | 
+          Made by vagrant ansible provisioner.
+        owner: root
+        group: root
+        mode: '0664'

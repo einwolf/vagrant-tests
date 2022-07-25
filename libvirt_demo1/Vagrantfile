@@ -1,0 +1,65 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.provider :libvirt do |libvirt|
+        libvirt.qemu_use_session = false
+        libvirt.storage_pool_name = "machines"
+    end
+
+    config.vm.define "centos7_01" do |centos7_01|
+        # Box name
+        #
+        centos7_01.vm.box = "centos/7"
+        centos7_01.vm.hostname = "centos7-01"
+
+        # Domain Specific Options
+        #
+        # See README for more info.
+        #
+        centos7_01.vm.provider :libvirt do |domain|
+            domain.memory = 2048
+            domain.cpus = 2
+            domain.graphics_type = "spice"
+            domain.video_type = "qxl"
+        end
+
+        centos7_01.ssh.dsa_authentication = "false"
+
+        # Shared directory
+        # Vagrant defines /vagrant as nfs by default
+        centos7_01.vm.synced_folder('.', '/vagrant', type: 'sshfs')
+
+        # Network interfaces for VM
+                
+        # centos7_01.vm.network :private_network,
+        #     :bridge => 'wlp2s0', :dev => 'wlp2s0', :ip => '10.20.30.40'
+        # centos7_01.vm.network :public_network,
+        #     :bridge => 'wlp2s0', :dev => 'wlp2s0', :ip => '10.20.30.41'
+
+        # Vagrant always uses the first network for management
+        # centos7_01.vm.network :private_network, :type => "dhcp", :ip => "10.20.30.40"
+        # centos7_01.vm.network :private_network, :ip => "10.20.30.40"
+
+        # Reminder there is always a private management NAT network created called vagrant-libvirt.
+
+        # This connects to a libvirt bridge network. (Which must be setup in advance.)
+        # centos7_01.vm.network :public_network,
+        #     :dev => "vibr0", :mode => "bridge", :type => "bridge"
+  
+
+        # Inline script provision
+        $script1 = <<-SCRIPT
+        echo "I am provisioning..."
+        date > /etc/vagrant_provisioned_at
+        SCRIPT
+
+        centos7_01.vm.provision "shell", inline: $script1
+
+        # Run Ansible from the Vagrant host to provision
+        centos7_01.vm.provision "ansible" do |ansible|
+            ansible.compatibility_mode = "2.0"
+            ansible.playbook = "provision-playbook1.yaml"
+        end
+    end
+end

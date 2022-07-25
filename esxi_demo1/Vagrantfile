@@ -256,7 +256,7 @@ Vagrant.configure("2") do |config|
                 #  RISKY. guest_custom_vmx_settings
                 #esxi.guest_custom_vmx_settings = [['vhv.enable','TRUE'], ['floppy0.present','TRUE']]
             
-                #  OPTIONAL. local_lax
+                #  OPTIONAL. Set local_lax option on ovftool
                 #esxi.local_lax = 'true'
             
                 #  OPTIONAL. Guest IP Caching
